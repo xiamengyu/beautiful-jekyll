@@ -8,35 +8,34 @@ subtitle: Percolator事务模型总结笔记-Draft
 tags: [percolator, 2pc, 分布式事务]
 ---
 
-Percolator本质上是2PC，基于MVCC与全局递增的TSO实现Snapshot Isolation。
+Percolator本质上是一种2PC，基于MVCC与全局递增的TSO实现Snapshot Isolation。
 
 ### Timestamp Oracle Server
 
-全局递增ID分配器，需要高性能高可用，本身是一个高可用组，基于时间戳加自增id生产全局唯一。自增id分配的在内存中自增能保证高性能，能达到2Mil/s。
+全局递增ID分配器，需要高性能高可用，本身是一个高可用组，基于时间戳加自增ID生成全局唯一且严格递增的uint64的整数。自增ID分配的在内存中自增能保证高性能，能达到2Mil/s。
 
 ### 多版本
 
 每个Put和Delete都是对操作的Key新增一个版本。Put覆盖的版本和Delete删标覆盖的版本，会由后续的GC做真正的删除。
 
-### 基于Snapshot的Get
+### Snapshot读
 
-Get的请求会先获取一个TSO作为start_ts，并且仅能读到小于这个TSO的最大已经提交的版本。
-由于读要能看到所有commit_ts < start_ts的数据，所以当读遇到锁时需要等待重试，等锁被resolve？或锁对应的事务提交。
+Get的请求会先获取一个TSO作为start_ts，并且仅能读到小于这个TSO的最大已经提交的版本。 所有commit_ts < start_ts的数据都需要能被读到，但是当遇到Lock，并且Lock的start_ts < 读请求的start_ts时需要等待重试，等锁被resolve或锁对应的事务提交。
 
-### 两阶段写
+### 2PC
 
 Percolator事务的两个阶段分别为Prewrite和Commit。
 
 #### PreWrite
 
-- 检查是否有已经commit_ts >  start_ts的数据，如果有则返回写-写冲突错误
+- 检查是否有已经 commit_ts > start_ts 的数据，如果有则返回写-写冲突错误
 - 检查是否有Lock，如果有则返回Lock冲突
 - 写入Data和Lock（是否需要Row-Based Transaction?）
 
 #### Commit
 
 - 检查是否有锁
-- 检查是否有检查是否有已经commit_ts >  start_ts的数据
+- 检查是否有检查是否有已经 commit_ts > start_ts 的数据
 - 写入commit列，删除锁（是否需要Row-Based Transaction?）
 
 #### 异步提交Secondary
