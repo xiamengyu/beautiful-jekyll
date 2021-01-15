@@ -16,8 +16,8 @@ author: xiamengyu
 navbar-links:
   首页: "index"
   关于作者: "aboutme"
-  文章列表: "https://www.markdowntutorial.com/"
-  源码研究: "https://deanattali.com"
+  文章列表: "index"
+  源码研究: "index"
 
 # --- Logo --- #
 
