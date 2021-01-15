@@ -1,16 +1,13 @@
 ---
 layout: page
-title: About me
-subtitle: Why you'd want to go on a date with me
+title: 关于作者
+subtitle: 分布式系统爱好者
 ---
 
-My name is Inigo Montoya. I have the following qualities:
+喜欢编程，热爱技术，注重理论加实践，目前在做分布式存储系统。
 
-- I rock a great mustache
-- I'm extremely loyal to my family
 
-What else do you need?
+### 涉及领域
 
-### My story
+微服务框架、分布式存储系统
 
-To be honest, I'm having some trouble remembering right now, so why don't you just watch [my movie](https://en.wikipedia.org/wiki/The_Princess_Bride_%28film%29) and it will answer **all** your questions.
